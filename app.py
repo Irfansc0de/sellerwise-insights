@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 app.secret_key = "nxtsecurekey"
 
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = "/tmp/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # ---------------- DATABASE INIT ----------------
@@ -603,3 +603,4 @@ import os
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
