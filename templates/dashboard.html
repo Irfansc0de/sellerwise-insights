@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SellerWise Insight Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: #111;
+            height: 100vh;
+            padding: 25px;
+            box-shadow: 2px 0 15px #00f5ff22;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            color: #00f5ff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            margin-bottom: 8px;
+        }
+
+        .sidebar a:hover {
+            color: #00f5ff;
+        }
+
+        .filter-box {
+            margin-top: 15px;
+            border-top: 1px solid #222;
+            padding-top: 15px;
+        }
+
+        label {
+            font-size: 12px;
+            color: #00f5ff;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 12px 0;
+            background: #000;
+            color: white;
+            border: 1px solid #00f5ff;
+        }
+
+        button {
+            background: #00f5ff;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            padding: 30px 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #00f5ff;
+        }
+
+        /* KPI CARDS */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px #00f5ff22;
+        }
+
+        .card h3 {
+            color: #00f5ff;
+            font-size: 14px;
+        }
+
+        .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .positive { color: #00ff88; }
+        .negative { color: #ff0055; }
+
+        /* AI INSIGHT */
+        .insight {
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px #00f5ff22;
+            margin-bottom: 30px;
+        }
+
+        .insight h3 {
+            color: #00f5ff;
+        }
+
+        /* CHARTS */
+        .charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .chart-box {
+            background: #111;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px #00f5ff22;
+            height: 350px;
+        }
+
+        .chart-wide {
+            grid-column: span 2;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+
+    <h2>Insight</h2>
+
+    <a href="/dashboard">Dashboard</a>
+    <a href="/upload-data">Upload Data</a>
+    <a href="/logout">Logout</a>
+
+    <div class="filter-box">
+        <form method="POST" action="/dashboard">
+
+            <label>Platform</label>
+            <select name="platform" required>
+                <option value="">-- Select Platform --</option>
+                {% for p in platforms %}
+                    <option value="{{ p }}">{{ p }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Year</label>
+            <select name="year">
+                <option value="">-- Latest --</option>
+                {% for y in years %}
+                    <option value="{{ y }}">{{ y }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Month</label>
+            <select name="month">
+                <option value="">-- Full Year --</option>
+                {% for m in range(1,13) %}
+                    <option value="{{ m }}">{{ m }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Compare Month A</label>
+            <select name="compare_a">
+                <option value="">-- None --</option>
+                {% for m in range(1,13) %}
+                    <option value="{{ m }}">{{ m }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Compare Month B</label>
+            <select name="compare_b">
+                <option value="">-- None --</option>
+                {% for m in range(1,13) %}
+                    <option value="{{ m }}">{{ m }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Apply Filter</button>
+
+        </form>
+    </div>
+
+</div>
+
+<div class="main">
+
+    <h1>Financial Dashboard</h1>
+
+    <!-- KPI CARDS -->
+    <div class="cards">
+        <div class="card">
+            <h3>Net Sales</h3>
+            <div class="value">₹ {{ "{:,.2f}".format(summary.net_sales) }}</div>
+        </div>
+
+        <div class="card">
+            <h3>Expenses</h3>
+            <div class="value">₹ {{ "{:,.2f}".format(summary.expenses) }}</div>
+        </div>
+
+        <div class="card">
+            <h3>Earnings</h3>
+            <div class="value">₹ {{ "{:,.2f}".format(summary.earnings) }}</div>
+        </div>
+
+        <div class="card">
+            <h3>Margin %</h3>
+            <div class="value">{{ summary.margin }}%</div>
+        </div>
+    </div>
+
+    <!-- AI INSIGHT -->
+    {% if ai_insight %}
+    <div class="insight">
+        <h3>AI Business Insight</h3>
+
+        <p>
+            {% if ai_insight.sales_growth >= 0 %}
+                📈 Sales increased by <span class="positive">{{ ai_insight.sales_growth }}%</span>
+            {% else %}
+                📉 Sales decreased by <span class="negative">{{ ai_insight.sales_growth }}%</span>
+            {% endif %}
+        </p>
+
+        <p>
+            {% if ai_insight.earnings_growth >= 0 %}
+                💰 Earnings improved by <span class="positive">{{ ai_insight.earnings_growth }}%</span>
+            {% else %}
+                ⚠ Earnings dropped by <span class="negative">{{ ai_insight.earnings_growth }}%</span>
+            {% endif %}
+        </p>
+
+        <p>
+            {% if ai_insight.expense_growth <= 0 %}
+                🟢 Expenses reduced by <span class="positive">{{ ai_insight.expense_growth }}%</span>
+            {% else %}
+                🔴 Expenses increased by <span class="negative">{{ ai_insight.expense_growth }}%</span>
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- CHARTS -->
+    <div class="charts">
+
+        <div class="chart-box">
+            <canvas id="barChart"></canvas>
+        </div>
+
+        <div class="chart-box">
+            <canvas id="pieChart"></canvas>
+        </div>
+
+        <div class="chart-box chart-wide">
+            <canvas id="lineChart"></canvas>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Sales', 'Expenses', 'Earnings'],
+        datasets: [{
+            data: [{{ summary.net_sales }}, {{ summary.expenses }}, {{ summary.earnings }}],
+            backgroundColor: ['#00f5ff', '#ff0055', '#00ff88']
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+
+new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+        labels: ['Earnings', 'Expenses'],
+        datasets: [{
+            data: [{{ summary.earnings }}, {{ summary.expenses }}],
+            backgroundColor: ['#00f5ff', '#ff0055']
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+
+new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+        labels: {{ labels | tojson }},
+        datasets: [{
+            label: 'Net Sales Trend',
+            data: {{ sales_data | tojson }},
+            borderColor: '#00f5ff',
+            backgroundColor: '#00f5ff33',
+            fill: true,
+            tension: 0.3
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+
+</script>
+
+</body>
+</html>
