@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SKU Dashboard</title>
+    <style>
+        body {
+            background-color: #0b0f14;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid cyan;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #111;
+        }
+
+        a {
+            color: cyan;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        hr {
+            margin: 30px 0;
+            border: 0;
+            border-top: 1px solid #333;
+        }
+
+    </style>
+</head>
+<body>
+
+<h2>{{ platform }} - SKU Analytics ({{ month }}/{{ year }})</h2>
+
+<hr>
+
+{% if data and data|length > 0 %}
+
+<table>
+    <tr>
+        <th>SKU</th>
+        <th>Units Sold</th>
+        <th>Revenue (₹)</th>
+    </tr>
+
+    {% for row in data %}
+    <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1] }}</td>
+        <td>₹ {{ "%.2f"|format(row[2]) }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{% else %}
+    <p>No SKU data available for this month.</p>
+{% endif %}
+
+<br><br>
+
+<a href="/platform/{{ platform.lower() }}/{{ year }}/{{ month }}">
+    ← Back to Month Dashboard
+</a>
+
+</body>
+</html>

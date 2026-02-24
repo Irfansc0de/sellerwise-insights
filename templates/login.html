@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - SellerWise Insight</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            font-family: Arial;
+        }
+
+        .box {
+            background: #111;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #00f5ff33;
+        }
+
+        input {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 250px;
+            background: #000;
+            color: white;
+            border: 1px solid #00f5ff;
+        }
+
+        button {
+            background: #00f5ff;
+            padding: 10px;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px #00f5ff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>SELLERWISE INSIGHT</h2>
+    {% if error %}
+        <p style="color:red">{{ error }}</p>
+    {% endif %}
+    <form method="post">
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+</body>
+</html>

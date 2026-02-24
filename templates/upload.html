@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Excel</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial;
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        select, input, button {
+            padding: 10px;
+            margin: 10px;
+        }
+
+        button {
+            background: #00f5ff;
+            border: none;
+            font-weight: bold;
+        }
+
+        a {
+            color: #00f5ff;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Upload Excel File</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    <select name="platform" required>
+        <option value="">Select Platform</option>
+        <option value="Flipkart">Flipkart</option>
+        <option value="Amazon">Amazon</option>
+        <option value="Meesho">Meesho</option>
+        <option value="WooCommerce">WooCommerce</option>
+        <option value="Shopify">Shopify</option>
+    </select>
+
+    <br>
+
+    <input type="file" name="file" required>
+
+    <br>
+
+    <button type="submit">Upload</button>
+</form>
+
+<br>
+<a href="/platform/flipkart">← Back</a>
+
+</body>
+</html>

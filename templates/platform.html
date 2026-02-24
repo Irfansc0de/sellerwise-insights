@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ platform }} - Monthly Data</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            color: white;
+            font-family: Arial;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #111;
+            height: 100vh;
+            padding: 25px;
+            box-shadow: 2px 0 15px #00f5ff22;
+        }
+
+        .sidebar h2 {
+            color: #00f5ff;
+            text-align: center;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            margin: 12px 0;
+        }
+
+        .sidebar a:hover {
+            color: #00f5ff;
+        }
+
+        .main {
+            flex: 1;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #00f5ff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            border: 1px solid #00f5ff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #111;
+            color: #00f5ff;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .view {
+            background: #00f5ff;
+            color: black;
+        }
+
+        .delete {
+            background: #ff0055;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Insight</h2>
+    
+        <a href="/platform/flipkart">Flipkart</a>
+        <a href="/platform/amazon">Amazon</a>
+        <a href="/platform/meesho">Meesho</a>
+        <a href="/platform/woocommerce">WooCommerce</a>
+        <a href="/platform/shopify">Shopify</a>
+    
+        <hr>
+    
+        <a href="/upload-data">Upload Data</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+<div class="main">
+    <h1>{{ platform }} - Monthly Reports</h1>
+
+    {% if data %}
+    <table>
+        <tr>
+            <th>Year</th>
+            <th>Month</th>
+            <th>Sales</th>
+            <th>Earnings</th>
+            <th>View</th>
+            <th>Delete</th>
+        </tr>
+
+        {% for row in data %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>₹ {{ "{:,.2f}".format(row[2]) }}</td>
+            <td>₹ {{ "{:,.2f}".format(row[3]) }}</td>
+
+            <td>
+                <a href="/platform/{{ platform.lower() }}/{{ row[0] }}/{{ row[1] }}">
+                    <button class="btn view">View</button>
+                </a>
+            </td>
+
+            <td>
+                <a href="/delete/{{ platform.lower() }}/{{ row[0] }}/{{ row[1] }}"
+                   onclick="return confirm('Are you sure you want to delete this month data?')">
+                    <button class="btn delete">Delete</button>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+
+    </table>
+    {% else %}
+        <p>No data uploaded yet.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>
