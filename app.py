@@ -598,9 +598,44 @@ def month_dashboard(platform, year, month):
         month=month,
         platform=normalized_platform
     )
+# ---------------- DELETE MONTH DATA ----------------
 
+@app.route("/delete/<platform>/<int:year>/<int:month>")
+def delete_month_data(platform, year, month):
+
+    if "user" not in session:
+        return redirect("/")
+
+    normalized_platform = platform.capitalize()
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    # Delete monthly summary
+    cursor.execute("""
+        DELETE FROM monthly_summary
+        WHERE LOWER(platform)=LOWER(?) AND year=? AND month=?
+    """, (normalized_platform, year, month))
+
+    # Delete SKU data
+    cursor.execute("""
+        DELETE FROM sku_data
+        WHERE LOWER(platform)=LOWER(?) AND year=? AND month=?
+    """, (normalized_platform, year, month))
+
+    # Delete daily sales
+    cursor.execute("""
+        DELETE FROM daily_sales
+        WHERE LOWER(platform)=LOWER(?) AND year=? AND month=?
+    """, (normalized_platform, year, month))
+
+    conn.commit()
+    conn.close()
+
+    return redirect(f"/platform/{platform}")
 import os
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
